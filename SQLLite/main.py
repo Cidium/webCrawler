@@ -27,7 +27,7 @@ for enlace in enlaces:
 #print(link.REFERENCE_URL)
 #print(link.REFERENCE_TIMES)
 
-links = database.getLinks("visited")
+links = database.getLinks("not_visited")
 
 for link in links:
     print(link.URL)
@@ -35,3 +35,4 @@ for link in links:
     print(link.ADDED_DATE)
     print(link.REFERENCE_URL)
     print(link.REFERENCE_TIMES)
+
