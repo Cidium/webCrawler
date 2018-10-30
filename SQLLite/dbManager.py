@@ -14,8 +14,28 @@ class DBManager:
     def __init__(self,database):
         self.database = database
 
-    def pushToDB(self,actual_url, parent_url):
-        #conn = sqlite3.connect('webCrawler.db')
+    def pushToDB (self,actual_url, parent_url):
+        conn = sqlite3.connect(self.database)
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM webPages WHERE URL=?",(actual_url,))
+        rows_affected=c.fetchone()
+
+        if rows_affected[0] == 0:
+            date = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+            c.execute("INSERT OR IGNORE INTO webPages (URL, ADDED_DATE, REFERENCE_URL, REFERENCE_TIMES)  VALUES (?,?,?,1)",(actual_url,date,parent_url))
+        else:
+            c.execute("SELECT * FROM webPages WHERE URL=?",(actual_url,))
+            rows = c.fetchall()
+            for row in rows:
+                link = Link(row[0],row[1],row[2],row[3],row[4])
+            ref = link.REFERENCE_TIMES + 1
+            c.execute("UPDATE webPages SET REFERENCE_TIMES=? WHERE URL=?",(ref,actual_url))
+
+        conn.commit()
+        c.close()
+        conn.close()
+
+    def pushToDBOLD(self,actual_url, parent_url):
         conn = sqlite3.connect(self.database)
         c = conn.cursor()
         date = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
